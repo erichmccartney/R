@@ -12,7 +12,8 @@ View(df)                                           # Data looks clean
 library(dplyr)
 df$eth = recode_factor(df$eth, "1"="Black", "2"="Hispanic", "3"="White")
 df$eth = relevel(df$eth, "White")
-df$crime = recode_factor(df$crime, "1"="Violent", "2"="Weapons", "3"="Property", "4"="Drug")
+df$crime = recode_factor(df$crime, "1"="Violent", "2"="Weapons", 
+                         "3"="Property", "4"="Drug")
 
 
 #' Data visualization
@@ -43,16 +44,21 @@ ggplot(df, aes(x=past.arrests, y=log(stops))) +
   geom_point(color= "steelblue") +                 # Fit polynomial plot
   geom_smooth(method="lm", formula = y ~ poly(x, 2), color="red")
 
+ggplot(df, aes(x=past.arrests, y=log(stops))) +
+  geom_point(color= "steelblue") +                 
+  geom_smooth(method="loess", color="red")        # Fit loess (non-linear)
+
 #' Question: What analysis should you do?
 #' Note: Observations are not independent; why?
 
 
 #' We want to analyze data across ALL crimes. So we must group data by precincts and 
-#' ethnic groups (combine crimes). This will give us 75*2 = 225 rows.
+#' ethnic groups (combine crimes). This will give us 75*3 = 225 rows.
 
 df.sum = df %>%
   group_by(precinct, eth) %>%
-  summarise(stops=sum(stops), past_arrests=sum(past.arrests), pop=round(mean(pop)))
+  summarise(stops=sum(stops), past_arrests=sum(past.arrests), 
+            pop=round(mean(pop)))
 View(df.sum)
 
 ggplot(df.sum, aes(x=stops, color=eth, fill=eth)) +
@@ -66,7 +72,6 @@ ggplot(df.sum, aes(x=log(past_arrests), y=log(stops), color=eth)) +
 
 ggplot(df.sum, aes(x=log(past_arrests), y=log(stops), group=eth, color=eth)) + 
   geom_point() + geom_smooth(method.args=list(degree=1))
-
 
 #' OLS: What will be a good OLS model?
 
@@ -86,9 +91,13 @@ mle <- glm(log(stops) ~ log(past_arrests) + eth, data=df.sum, family=gaussian)
 summary(mle)
 
 library(stargazer)
-stargazer(ols1, ols2, ols3, mle, type="text", title="Regression Models of Stop & Frisk Data")
-AIC(ols3)
+stargazer(ols1, ols2, ols3, mle, type="text", 
+          title="Regression Models of Stop & Frisk Data")
 
+AIC(ols3)
+install.packages("DescTools") #not required if "DescTools" is installed
+library("DescTools")
+PseudoR2(mle, c("McFadden", "Nagel"))
 
 #' Poisson regression
 #' stops is count data, and therefore has Poisson distribution
@@ -96,17 +105,24 @@ AIC(ols3)
 poisson1 <- glm(stops ~ 1, family=poisson (link=log), data=df.sum)   # Intercept only model
 summary(poisson1)
 
-poisson2 <- glm(stops ~ log(past_arrests), family=poisson (link=log), data=df.sum)
+poisson2 <- glm(stops ~ log(past_arrests), family=poisson (link=log), 
+                data=df.sum)
 summary(poisson2)
 
-poisson3 <- glm(stops ~ log(past_arrests) + eth, family=poisson (link=log), data=df.sum)
+poisson3 <- glm(stops ~ log(past_arrests) + eth, family=poisson (link=log), 
+                data=df.sum)
 summary(poisson3)
 
-stargazer(ols3, mle, poisson3, type="text", title="Model Comparison of Stop & Frisk Data")
+stargazer(ols3, mle, poisson3, type="text", 
+          title="Model Comparison of Stop & Frisk Data")
 
 #' Note: Poisson models have over-dispersion since residual deviance > degrees of freedom.
 #' This means that estimates are correct, but standard errors are wrong and unaccounted for
 #' by the model. In this case, a quasi-possion model or negative binomial model is appropriate. 
+
+install.packages("AER") #not required if "AER" is installed
+library(AER)
+dispersiontest(poisson3)  # p<0.05 suggests overdispersion
 
 qpoisson <- glm(stops ~ log(past_arrests) + eth, family=quasipoisson (link=log), data=df.sum)
 summary(qpoisson)
@@ -131,13 +147,16 @@ print(multipliers)
 
 #' Question: How can we estimate discrimination in specific precincts?
 
-mle <- glm(log(stops) ~ log(past_arrests) + eth + factor(precinct), data=df.sum, family=gaussian)
+mle <- glm(log(stops) ~ log(past_arrests) + eth + factor(precinct), 
+           data=df.sum, family=gaussian)
 summary(mle)
 
-poisson = glm(stops ~ log(past_arrests) + eth + factor(precinct), data=df.sum, family=poisson (link=log))
+poisson = glm(stops ~ log(past_arrests) + eth + factor(precinct), 
+              data=df.sum, family=poisson (link=log))
 summary(poisson)
 
-qpoisson <- glm(stops ~ log(past_arrests) + eth + factor(precinct), data=df.sum, family=quasipoisson (link=log))
+qpoisson <- glm(stops ~ log(past_arrests) + eth + factor(precinct), data=df.sum, 
+                family=quasipoisson (link=log))
 summary(qpoisson)
 
 nbinom <- glm.nb(stops ~ log(past_arrests) + eth + factor(precinct), data=df.sum)
@@ -145,9 +164,10 @@ summary(nbinom)
 
 #' Visualizing findings using jtools (jtools also requires broom and ggstance packages)
 
-# install.packages("jtools")
-# install.packages("broom")
-# install.packages("ggstance")
+install.packages("jtools")
+install.packages("broom")
+install.packages("broom.mixed")
+install.packages("ggstance")
 
 library(jtools)
 plot_summs(qpoisson, scale=TRUE, exp=TRUE)
