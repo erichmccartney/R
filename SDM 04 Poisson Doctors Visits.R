@@ -3,7 +3,7 @@
 
 #' Read & preprocess data
 
-setwd("C:/Users/abhatt/Desktop/SDM/Data")
+#setwd("C:/Users/.....")
 library("readxl")
 d <- read_excel("DoctorVisits.xlsx", sheet="Data")
 str(d)
