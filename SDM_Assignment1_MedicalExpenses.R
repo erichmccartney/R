@@ -1,38 +1,25 @@
-#' SDM A2: Hunters Green Home Sales
+#' SDM Assignment 1: Medical Expenses
 
 library(readxl)
 setwd("~/GitHub/R/DataSets")
-df <- read_excel("HuntersGreenHomeSales.xlsx", sheet='Data')
+df <- read_excel("HealthInsurance.xlsx", sheet='Data')
+dim(df)
 str(df)
-
-#' Feature engineering/Data Preprocessing
-#' (this is SUPER-IMPORTANT, but something that most of you will never do)
-
-df$baths <- df$bathsfull + 0.5*df$bathshalf
-df$specialsale <- ifelse(df$splsale=='None', 0, 1)
-df$tileroof <- ifelse(df$Roof=='Tile' | df$Roof=='Slate' | df$Roof=='Slate, Tile' |
-                        df$Roof=='Concrete, Tile', 1, 0)
-df$privatepool <- ifelse(df$Pool=='Private' | df$Pool=='Private, Community', 1, 0)
-df$communitypool <- ifelse(df$Pool=='Community' | df$Pool=='Private, Community', 1, 0)
-df$year <- as.numeric(format(df$PendingDate,'%Y'))
 View(df)
 
-which(! complete.cases(df)) 
-colSums(is.na(df))
-# We have 311 NA values in spa; hence, it's better to avoid this variable
-df1 <- df[, -c(1:3, 5:7, 10, 13:15, 17, 20, 22:24)]
-str(df1)
-
 #' Data visualizations
+hist(df$medexpense)
+hist(log(df$medexpense))
 
-hist(df$pricesold)
-hist(df$adom_agentdaysonmarket)
-hist(log(df$adom_agentdaysonmarket))
+which(! complete.cases(df)) #no missing values
+colSums(is.na(df)) #no missing values
 
+df1 <- df[, -c(11, 14:15, 28:29)]
 
 temp <- df1[, c(1:10)]
 library(PerformanceAnalytics)
 chart.Correlation(temp)
+
 
 #' High correlations (>0.8) between listprice, sqft, and lotsqft; between pricesold and listprice (1.00); 
 #' and between baths, pricesold, listprice, and sqft. Since sqft is a core predictor of pricesold, 
@@ -41,17 +28,18 @@ chart.Correlation(temp)
 
 #' Regression models
 
-m1 <- lm(pricesold ~ sqft + Beds + baths + garages + tileroof + yrblt + 
-              privatepool + communitypool + specialsale + year, data=df1)
-summary(m1)
-
-m2 <- lm(pricesold ~ sqft*Beds + sqft*baths + garages + tileroof + yrblt + 
-              privatepool + communitypool + specialsale + year, data=df1)
-
-m3 <- lm(pricesold ~ year, data=df1)         # Why is this model interesting?
-
 library(stargazer)
-stargazer(m3, m1, m2, type='text', single.row=TRUE)
+
+m1 <- lm(medexpense ~ healthins + female + blackhisp + age*income + illnesses + ssiratio + private + 
+           married + msa, data = df1)
+
+m2 <- lm(medexpense ~ healthins + age + female + blackhisp + logincome + illnesses +  ssiratio +private + 
+           married + msa + lowincome, data=df1)
+
+m3 <- lm(medexpense ~ age + female + blackhisp + logincome + illnesses +  ssiratio +private + 
+           married + msa + poverty, data=df1)
+
+stargazer(m1, m2, m3, type='text', single.row=TRUE)
 
 m4 <- lm(adom_agentdaysonmarket ~ yrblt + privatepool + communitypool + specialsale + lppersqft + year, data=df)
 

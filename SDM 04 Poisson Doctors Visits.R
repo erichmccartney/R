@@ -3,8 +3,8 @@
 
 #' Read & preprocess data
 
-#setwd("C:/Users/.....")
 library("readxl")
+setwd("~/GitHub/R/DataSets")
 d <- read_excel("DoctorVisits.xlsx", sheet="Data")
 str(d)
 
