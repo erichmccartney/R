@@ -2,7 +2,7 @@
 #' Crimes in 90 North Carolina Counties over 7 years (1981-1987)
 #' Level 2: County, Level 1: Year
 
-setwd("C:/Users/abhatt/Desktop/SDM/Data")
+setwd("~/GitHub/R/DataSets")
 library(readxl)
 Crime <- read_excel("CrimeNC.xlsx")
 View(Crime)
