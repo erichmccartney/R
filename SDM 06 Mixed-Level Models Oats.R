@@ -3,11 +3,14 @@
 #' Question: How do nitrogen content in fertilizer impact yields of different varieties of oats?
 #' Note: This is an example of a 3x6 factorial experimental design
 
-setwd("C:/Users/abhatt/Desktop/SDM/Data")
+setwd("~/GitHub/R/DataSets")
 d <- read.csv("OatsYield.csv")
 str(d)
 summary(d)
 View(d)
+
+d$variety <- factor(d$variety)
+d$variety <- relevel(d$variety, ref="Victory")
 
 #' Data visualizations
 
@@ -17,6 +20,7 @@ histogram(~yield, data=d)
 densityplot(~yield, data=d)
 densityplot(~yield | variety, data=d)
 densityplot(~yield | block, data=d)
+densityplot(~yield | variety*block, data=d)
 
 bwplot(yield ~ variety, data=d)
 bwplot(yield ~ block, data=d)
@@ -30,7 +34,6 @@ xyplot(yield ~ nitrogen | variety*block, data=d)
 
 ols <- lm(yield ~ nitrogen*variety, data=d)
 summary(ols)
-d$variety <- relevel(d$variety, ref="Victory")
 ols <- lm(yield ~ nitrogen*variety, data=d)
 confint(ols)
 

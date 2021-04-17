@@ -2,7 +2,7 @@
 #' 5074 weight observations from 1064 children over multiple days, with suspected infection.
 #' Level 1: day, Level 2: Patient
 
-setwd("C:/Users/abhatt/Desktop/SDM/Data")
+setwd("~/GitHub/R/DataSets")
 d <- read.csv("Cryptosporidium.csv")
 str(d)
 
