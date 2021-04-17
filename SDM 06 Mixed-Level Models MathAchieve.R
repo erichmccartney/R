@@ -2,7 +2,7 @@
 #' Math Achievement: Analysis of math scores of 7145 students' from 160 schools
 #' Data at two levels: Level 1 = Students, Level 2 (block/group) = Schools
 
-setwd("C:/Users/abhatt/Desktop/SDM/Data")
+setwd("~/GitHub/R/DataSets")
 
 #' Read data sets from nlme library
 
@@ -41,7 +41,7 @@ hist(d$MathAch)
 library(lme4)                  
 
 #' Interclass correlation (ICC) can be computed using merTools package
-#' install.packages("merTools")
+install.packages("merTools")
 library(merTools)
 ICC(outcome="MathAch", group="School", data=d)
 
@@ -50,16 +50,16 @@ ICC(outcome="MathAch", group="School", data=d)
 m1 <- lmer(MathAch ~ 1 + (1 | School), data=d, REML=FALSE)   
 summary(m1)
 confint(m1)
-AIC(m1)
-fixef(m1)                                       # Magnitude of fixed effect
-ranef(m1)                                       # Magnitude of random effect
-coef(m1)                                        # Magnitude of total effect
+AIC(m1)                           # Akaike's An Information Criterion for glm model
+fixef(m1)                         # Magnitude of fixed effect
+ranef(m1)                         # Magnitude of random effect
+coef(m1)                          # Magnitude of total effect
 
 #' Random intercept model with fixed Level 1 predictors 
 m2 <- lmer(MathAch ~ SES + Sex + Minority + (1 | School), data=d, REML=FALSE) 
 summary(m2)
 confint(m2)
-anova(m1, m2)                                   # Chi-sq test for comparing nested models 
+anova(m1, m2)                     # Chi-sq test for comparing nested models 
 
 #' Random intercept model with fixed Level 1 and Level 2 predictors 
 m3 <- lmer(MathAch ~ SES + Sex + Minority + Sector + Size + (1 | School), data=d, REML=FALSE) 
@@ -71,7 +71,9 @@ library(stargazer)
 stargazer(m1, m2, m3, type="text")
 
 #' Model with two Level 2 random intercepts
-m4 <- lmer(MathAch ~ 1 + (1 | School) + (1 | Size), data=d, REML=FALSE)   
+m4 <- lmer(MathAch ~ 1 + (1 | School) + (1 | Size), data=d, REML=FALSE) 
+#' move size to fixed variable from random
+#' m4 <- lmer(MathAch ~ 1 + Size + (1 | School), data=d, REML=FALSE)
 summary(m4)
 anova(m1, m4)                                   # Adding size adds no further explanation to schools
 coef(m4)
@@ -115,4 +117,3 @@ summary(m10)
 coef(m10)
 anova(m2, m10)                                   
 #' Question: Why is it that m9 is better fit than m2, but m10 is not?
-
