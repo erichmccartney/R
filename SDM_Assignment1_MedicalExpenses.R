@@ -14,6 +14,12 @@ hist(log(df$medexpense))
 which(! complete.cases(df)) #no missing values
 colSums(is.na(df)) #no missing values
 
+table(df$healthins)
+table(df$private)
+table(df$healthins, df$private)
+df$privateclean <- ifelse(df$healthins==0 & df$private==0, NA, df$private)
+table(df$privateclean)
+
 df1 <- df[, -c(11, 14:15, 28:29)]
 df2 <- df1[sample(1:nrow(df1),5000),]
 
