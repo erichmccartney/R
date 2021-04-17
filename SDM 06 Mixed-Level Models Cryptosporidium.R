@@ -45,6 +45,7 @@ ranef(re)
 coef(re)
 
 library(stargazer)
+options(max.print=100)
 stargazer(ols, fe, re, type="text", single.row=TRUE)
 
 
