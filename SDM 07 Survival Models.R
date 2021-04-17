@@ -4,7 +4,7 @@
 #' Y: Time, Event (Time to Event)
 #' X: LogWage, Age, UnempIns
 
-setwd("C:/Users/abhatt/Desktop/SDM/Data")
+setwd("~/GitHub/R/DataSets")
 d <- read.csv("Unemployment.csv")
 str(d)
 View(d)
@@ -26,7 +26,7 @@ table(UnempIns, Event)
 library(survival)
 y <- Surv(Time, Event)              # Y is a combination of time and event
 
-km1 <- survfit(y ~ 1)      
+km1 <- survfit(y ~ 1)               # survfit is kaplan-meier model 
 summary(km1)
 plot(km1, xlab="Time", ylab="Survival Probability")
 
@@ -36,7 +36,7 @@ summary(km2)
 plot(km2, xlab="Time", ylab="Survival Probability")
 
 # Nelson-Aalen non-parametric analysis
-na <- survfit(y ~ 1, type="aalen")
+na <- survfit(y ~ 1, type="aalen") # type producing an error, need to investigate
 summary(na)
 plot(na, xlab="Time", ylab="Survival Probability")
 
