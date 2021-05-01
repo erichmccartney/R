@@ -1,7 +1,7 @@
 #' Time Series: Trend, Seasonality, and Lagged Analysis of Multivariate Data
 #' Data: Cocacola.csv
 
-setwd("C:/Users/abhatt/Desktop/SDM/Data")
+setwd("~/GitHub/R/DataSets")
 d <- read.csv("CocaCola.csv")
 View(d)
 str(d)
@@ -9,7 +9,9 @@ str(d)
 #' Linear trend model
 
 n <- nrow(d)
+n
 d$Time <- seq(1:n)
+d$Time
 
 m1 <- lm(Sales ~ Time, data=d)
 summary(m1)
@@ -17,13 +19,15 @@ summary(m1)
 plot(Sales ~ Time, data=d)
 abline(m1, col="red")
 plot(m1)
-plot(m1$res ~ d$t)
 
 #' Additive seasonality model
 
 d$Qtr <- rep(1:4, n/4)
+d$Qtr
 d$Qtr <- factor(d$Qtr)
+d$Qtr
 d$Qtr <- relevel(d$Qtr, 4)
+d$Qtr
 View(d)
 
 m2 <- lm(Sales ~ Time + Qtr, data=d)

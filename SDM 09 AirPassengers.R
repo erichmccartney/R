@@ -27,17 +27,20 @@ boxplot(ts ~ cycle(ts))               # Seasonality plot
 # Identification: Identify d in I(d)
 plot(log(ts))                      # Log takes care of unequal variance
 plot(diff(log(ts)))                # Differentiating makes the mean zero; hence d=1
+
 # install.packages("tseries")
 library(tseries)
-adf.test(diff(log(ts)))            # Augmented Dickey-Fuller Test, H0: Time series is not stationary
+adf.test(diff(log(ts)))            # Augmented Dickey-Fuller Test
+                                   # H0: Time series is not stationary
+
 # Question: Is the time series stationary? What inferences do we get from the above test?
 
 # Estimation: Estimate p and q for AR(p) and MA(q)
 acf(ts)                            # Correlation between Y(t) and lags Y(t-p)
                                    # Dashed blue line indicates 95% C.I. for stationary series
                                    # Our goal is to bring the ACFs within the blue lines
-acf(diff(log(ts)))                 # p = 2 for AR(p)
-pacf(diff(log(ts)))                # q = 1 for MA(q)
+acf(diff(log(ts)))                 # p = 2 for AR(p), look for first lag where sign changed
+pacf(diff(log(ts)))                # q = 1 for MA(q), look for first lag where sign changed
 
 # ARIMA model
 model <- arima(log(ts), c(2,1,1), seasonal=list(order=c(2,1,1), period=12))  # c(p,d,q)
@@ -46,6 +49,7 @@ model
 forecasted <- predict(model, n.ahead=5*12)
 forecasted
 forecasted <- exp(forecasted$pred)
+forecasted
 forecasted <- round(forecasted,0)
 forecasted
 
