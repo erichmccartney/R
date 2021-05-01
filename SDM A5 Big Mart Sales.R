@@ -5,7 +5,7 @@
 
 # Read & preprocess data
 
-setwd("C:/Users/abhatt/Desktop/SDM/Data")
+setwd("~/GitHub/R/DataSets")
 library("readxl")
 d <- read_excel("BigMartSales.xlsx", sheet="Data")
 str(d)
