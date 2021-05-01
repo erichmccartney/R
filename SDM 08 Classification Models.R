@@ -3,7 +3,7 @@
 #' Predicting 10-year coronary heart disease occurence in a sample of 4240 patients
 #' https://www.kaggle.com/neisha/heart-disease-prediction-using-logistic-regression/data
 
-setwd("C:/Users/abhatt/Desktop/SDM/Data")
+setwd("~/GitHub/R/DataSets")
 df <- read.csv("FraminghamCHD.csv")
 View(df)
 dim(df)
@@ -121,9 +121,9 @@ test_x <- test[ , c(1:14)]
 predlogit <-predict(logit, newdata=test_x, type="response")
 predlogit <- ifelse(predlogit>0.5, 1, 0)
 
+table(test$TenYearCHD, predlogit)                         # Confusion matrix
 ClassificationError <- mean(predlogit != test$TenYearCHD) # Classification error
 print(paste("Accuracy = ", 1-ClassificationError))        # Accuraty rate
-table(test$TenYearCHD, predlogit)                         # Confusion matrix
 
 # install.packages("ROCR")
 library(ROCR)
